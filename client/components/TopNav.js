@@ -33,7 +33,7 @@ const TopNav = () => {
     }
 
   return (
-    <Menu mode='horizontal' selectedKeys={[current]}>
+    <Menu mode='horizontal' selectedKeys={[current]} className='mb-2'>
          <Item key="/" onClick={(e)=>setCurrent(e.key)} icon={<AppstoreOutlined />}>
             <Link legacyBehavior href="/">
                 <a>App</a>
@@ -55,7 +55,13 @@ const TopNav = () => {
          )}
 
 
-
+        {user && user.role && user.role.includes("Instructor") && (
+            <Item key="/instructor" onClick={(e)=>setCurrent(e.key)} icon={<TeamOutlined />}>
+                <Link legacyBehavior href="/instructor">
+                    <a>Instructor</a>
+                </Link>
+            </Item>
+        )}
 
 
 

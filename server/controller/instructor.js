@@ -13,7 +13,7 @@ export const makeInstructor=async(req,res)=>{
     if(!user.stripe_account_id){
         const account=await stripe.accounts.create({type:'standard'})
         console.log("ACCOUNT=>",account)
-        user.stripe_account_id=account._id
+        user.stripe_account_id=account.id
         user.save()
     }
     //3. create account link based on the account id(for frontend to send the response)
@@ -31,5 +31,46 @@ export const makeInstructor=async(req,res)=>{
     res.send(`${accountLink.url}?${queryString.stringify(accountLink)}`)
     } catch (error) {
         console.log("MAKE INSTRUCTOR ERROR=>",error)
+    }
+}
+
+export const getAccountStatus=async(req,res)=>{
+    try {
+        //find the user from the database
+        const user=await User.findById(req.auth._id).exec()
+        //get the updated stripe account status
+        const account=await stripe.accounts.retrieve(user.stripe_account_id)
+        //check user has completed all the requirements
+        if(!account.charges_enabled){
+            return res.status(401).send('Unauthorized')
+        }
+        else{
+            //set the stripe_seller info in cloud
+            const statusUpdated=await User.findByIdAndUpdate(user._id,{
+                stripe_seller:account,
+                //addToset ensures no duplicates
+                $addToSet:{role:'Instructor'},
+
+            },{new:true}).exec();
+            statusUpdated.password=undefined
+            res.json(statusUpdated)
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const currentInstructor=async(req,res)=>{
+    try {
+        let  user=await User.findById(req.auth._id).select("-password").exec()
+        if(!user.role.includes("Instructor")){
+            return res.sendStatus(403)
+        }
+        else{
+            res.json({ok:true})
+        }
+
+    } catch (error) {
+        console.log(error)
     }
 }
