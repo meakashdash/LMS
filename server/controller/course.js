@@ -2,6 +2,7 @@ import AWS from 'aws-sdk'
 import {nanoid} from 'nanoid'
 import slugify from 'slugify'
 import Course from '../models/course.js'
+import {readFileSync} from 'fs'
 
 const awsConfig={
     accessKeyId:process.env.AWS_ACCESS_KEY_ID,
@@ -98,5 +99,79 @@ export const create=async(req,res)=>{
         res.json(course);
     } catch (error) {
         console.log(error);
+    }
+}
+
+export const instructorCourses=async(req,res)=>{
+    try {
+        const courses=await Course.find({instructor:req.auth._id}).sort({createdAt:-1}).exec();
+        res.json(courses);
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+export const read=async(req,res)=>{
+    try {
+        const course=await Course.findOne({slug:req.params.slug}).populate("instructor","_id name").exec();
+        res.json(course);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const uploadVideo=async(req,res)=>{
+    try {
+        const {video}=req.files;
+        // console.log(video);
+        if(!video){
+            return res.status(400).send("No video");
+        }
+
+        const params={
+            Bucket:'lms-bucket-akash',
+            Key:`${nanoid()}.${video.type.split('/')[1]}`,
+            Body:readFileSync(video.path),
+            ACL:'public-read',
+            ContentType:video.type
+        }
+
+        S3.upload(params,(error,data)=>{
+            if(error){
+                console.log(error);
+                return res.sendStatus(400).json({error:"Upload to s3 failed"});
+            }
+            console.log(data);
+            return res.send(data);
+        });
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const removeVideo=async(req,res)=>{
+    try {
+        const {Bucket,Key}=req.body;
+
+        // if(!video){
+        //     return res.status(400).send("No video");
+        // }
+
+        const params={
+            Bucket,
+            Key,
+        }
+
+        S3.deleteObject(params,(error,data)=>{
+            if(error){
+                console.log(error);
+                res.sendStatus(400).json({error:"Upload to s3 failed"});
+            }
+            console.log(data);
+            res.send({ok:true});
+        });
+    } catch (error) {
+        console.log(error)
     }
 }
