@@ -118,7 +118,7 @@ const CourseView=()=>{
                                     <p className='mt-2'>{course.lessons && course.lessons.length} Lessons</p>
                                     <div className='d-flex justify-content-between'>
                                         <Tooltip title='Edit'>
-                                            <EditOutlined className='h5 text-warning' />
+                                            <EditOutlined onClick={()=>router.push(`/instructor/course/edit/${slug}`)} className='h5 text-warning' />
                                         </Tooltip>
                                         <Tooltip title='Publish'>
                                             <CheckOutlined className='h5 text-danger' />
