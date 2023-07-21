@@ -2,11 +2,13 @@ import {useState,useEffect} from 'react';
 import {useRouter} from 'next/router';
 import axios from 'axios';
 import InstructorRoute from '../../../../components/routes/InstructorRoute';
-import {Avatar,Tooltip,Row, Col, Card,Button,Modal} from 'antd'
+import {Avatar,Tooltip,Row, Col, Card,Button,Modal,List} from 'antd'
 import { CheckOutlined,EditOutlined,PlusOutlined } from '@ant-design/icons';
 import ReactMarkdown from 'react-markdown';
 import AddLessonForm from '../../../../components/forms/AddLessonForm';
-import {toast} from 'react-toastify';	
+import {toast} from 'react-toastify';
+
+const {Item}=List;
 
 const CourseView=()=>{
     const[course,setCourse]=useState({});
@@ -43,6 +45,18 @@ const CourseView=()=>{
     //function to add lesson
     const handleAddLesson=async(e)=>{
         e.preventDefault();
+        try {
+            const {data}=await axios.post(`/api/course/lesson/${slug}/${course.instructor._id}`,values);
+            console.log(data);
+            setValues({...values,title:"",content:"",video:{}});
+            setUploadButtonText('Upload Video');	
+            setVisible(false);
+            setCourse(data);
+            toast.success('Lesson added');
+        } catch (error) {
+            console.log(error);
+            toast.error('Lesson creation failed');
+        }
     }
 
     //for video upload 
@@ -57,7 +71,7 @@ const CourseView=()=>{
             videoData.append('video',file);
 
             //now we have to send the video to the backend
-            const {data}=await axios.post('/api/course/upload-video',videoData,{
+            const {data}=await axios.post(`/api/course/upload-video/${course.instructor._id}`,videoData,{
                 onUploadProgress:(e)=>{
                     setProgress(Math.round((100*e.loaded)/e.total));
                 }
@@ -80,7 +94,7 @@ const CourseView=()=>{
         try {
             // console.log(values);
             setUploading(true);
-            const {data}=axios.post('/api/course/remove-video',values.video);
+            const {data}=axios.post(`/api/course/remove-video/${course.instructor._id}`,values.video);
             setValues({...values,video:{}});
             setUploadButtonText('Upload Video');
             setUploading(false);
@@ -138,13 +152,21 @@ const CourseView=()=>{
                             <hr />
                             {/* Markdown 'source' is changed to children */}
                             <div><ReactMarkdown children={course.description} /></div>
-                            <h3>Course Outline</h3>
-                            <ul>
-                                {course.lessons &&
-                                course.lessons.map((lesson, index) => (
-                                    <li key={index}>{lesson.title}</li>
-                                ))}
-                            </ul>
+                            <h2>Course Outline</h2>
+                            
+                            <hr />
+                            <h4>{course && course.lessons && course.lessons.length} Lessons</h4>
+                            <List itemLayout='horizontal' dataSource={course && course.lessons} renderItem={(item,index)=>(
+                                <Item>
+                                    <Item.Meta
+                                     avatar={<Avatar>{index+1}</Avatar>}
+                                     title={item.title}
+                                    >
+                                    </Item.Meta>
+                                </Item>
+                            )}>
+
+                            </List>
                             </Col>
                         </Row>
                     </div>

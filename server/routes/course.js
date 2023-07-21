@@ -1,5 +1,5 @@
 import express from 'express'
-import {uploadImage,removeImage,create,instructorCourses,read,uploadVideo,removeVideo} from '../controller/course'
+import {uploadImage,removeImage,create,instructorCourses,read,uploadVideo,removeVideo,addLesson} from '../controller/course'
 //middlewares
 
 import {requireSignin,isInstructor} from '../middlewares'
@@ -20,8 +20,10 @@ router.get('/instructor-courses',requireSignin,instructorCourses);
 //for getting the specific course
 router.get('/course/:slug',read);
 //for upload the video
-router.post('/course/upload-video',requireSignin,formidable(),uploadVideo);
+router.post('/course/upload-video/:instructorId',requireSignin,formidable(),uploadVideo);
 //for remove the video
-router.post('/course/remove-video',requireSignin,removeVideo);
+router.post('/course/remove-video/:instructorId',requireSignin,removeVideo);
+//for adding lesson in the database
+router.post('/course/lesson/:slug/:instructorId',requireSignin,addLesson);
 
 module.exports = router

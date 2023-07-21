@@ -123,6 +123,13 @@ export const read=async(req,res)=>{
 
 export const uploadVideo=async(req,res)=>{
     try {
+
+        //check if the video uploaded by instructor or not
+        if(req.auth._id!=req.params.instructorId){
+            return res.status(400).send("Unauthorized");
+        }
+
+
         const {video}=req.files;
         // console.log(video);
         if(!video){
@@ -152,11 +159,15 @@ export const uploadVideo=async(req,res)=>{
 
 export const removeVideo=async(req,res)=>{
     try {
-        const {Bucket,Key}=req.body;
 
-        // if(!video){
-        //     return res.status(400).send("No video");
-        // }
+
+        //check if the video uploaded by instructor or not
+        if(req.auth._id!=req.params.instructorId){
+            return res.status(400).send("Unauthorized");
+        }
+
+
+        const {Bucket,Key}=req.body;
 
         const params={
             Bucket,
@@ -175,3 +186,26 @@ export const removeVideo=async(req,res)=>{
         console.log(error)
     }
 }
+
+
+export const addLesson=async(req,res)=>{
+    try {
+        const {slug,instructorId}=req.params;
+        const {title,content,video}=req.body;
+
+        if(req.auth._id != instructorId){
+            return res.status(400).send("Unauthorized");
+        }
+
+        //if we dont add the new:true theby default it will return the old data
+        const updated=await Course.findOneAndUpdate({slug},{
+            $push:{lessons:{title,content,video}}
+        },{new:true}).populate("instructor","_id name").exec();
+
+        res.json(updated);
+    } catch (error) {
+        console.log(error);
+        return res.status(400).send("Add Lesson Failed");
+    }
+}
+
