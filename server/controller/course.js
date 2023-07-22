@@ -229,3 +229,48 @@ export const update=async(req,res)=>{
     }
 }
 
+
+export const publishCourse=async(req,res)=>{
+    try {
+        const {courseId}=req.params;
+        const course=await Course.findById(courseId).exec();
+
+        if(course.instructor!=req.auth._id){
+            return res.status.send("Unauthorized");
+        }
+
+        const updated=await Course.findByIdAndUpdate(courseId,{published:true},{new:true}).exec();
+        res.json(updated);
+    } catch (error) {
+        console.log(error);
+        return res.status(400).send("Publish course failed"	)
+    }
+}
+
+export const unpublishCourse=async(req,res)=>{
+    try {
+        const {courseId}=req.params;
+        const course=await Course.findById(courseId).exec();
+
+        if(course.instructor!=req.auth._id){
+            return res.status.send("Unauthorized");
+        }
+
+        const updated=await Course.findByIdAndUpdate(courseId,{published:false},{new:true}).exec();
+        res.json(updated);
+    } catch (error) {
+        console.log(error);
+        return res.status(400).send("Publish course failed"	)
+    }
+}
+
+export const courses=async(req,res)=>{
+    try {
+        const courses=await Course.find({published:true}).populate("instructor","_id name").exec();
+        res.json(courses);
+    } catch (error) {
+        console.log(error);
+        return res.status(400).send("Course fetch failed");
+    }
+}
+

@@ -11,10 +11,10 @@ const InstructorNav=()=>{
     return(
         <div className='nav flex-column nav-pills'>
             <Link legacyBehavior href='/instructor'>
-                <a className={`nav-link ${current === "/instructor" && "active"} `}>Dashboard</a>
+                <a style={{textDecoration: 'none'}} className={`nav-link ${current === "/instructor" && "active"} `}>Dashboard</a>
             </Link>
             <Link legacyBehavior href='/instructor/course/create'>
-                <a className={`nav-link ${current === '/instructor/course/create' && 'active'} `}>Course Create</a>
+                <a style={{textDecoration: 'none'}} className={`nav-link ${current === '/instructor/course/create' && 'active'} `}>Course Create</a>
             </Link>
         </div>
     )

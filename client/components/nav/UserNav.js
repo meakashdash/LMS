@@ -10,7 +10,7 @@ const UserNav=()=>{
     return(
         <div className='nav flex-column nav-pills'>
             <Link legacyBehavior href='/user'>
-                <a className={`nav-link ${current === "/user" && "active"} `}>Dashboard</a>
+                <a style={{textDecoration: 'none'}} className={`nav-link ${current === "/user" && "active"} `}>Dashboard</a>
             </Link>
         </div>
     )

@@ -33,7 +33,7 @@ const InstructorIndex=()=>{
                                 small
                                 hoverable
                                 style={{ width: 240 }}
-                                cover={<img alt="example" src={c.image?c.image.Location:'/download.png'} />}
+                                cover={<img alt="example" style={{ height: '200px', objectFit: 'cover' }}  src={c.image?c.image.Location:'/download.png'} />}
                             >
                                 <Meta title={c.name} description={c.lessons.length+" Lessons"} />
                                 <br />
