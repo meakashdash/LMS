@@ -1,11 +1,13 @@
 import { Badge, Card, Tooltip } from 'antd';
 import { EditOutlined, CheckOutlined } from '@ant-design/icons';
 import Link from 'next/link';
+import { currencyFormatter } from '../../utils/helpers';
 
 const CourseCard = ({ courses }) => {
+  console.log(courses);
   return (
     <>
-      {courses.map((course) => (
+      {courses && courses.map((course) => (
         <div key={course._id} className='col-md-4'>
           <Link legacyBehavior href={`/course/${course.slug}`}>
             <a style={{textDecoration: 'none'}}>
@@ -35,7 +37,10 @@ const CourseCard = ({ courses }) => {
                 <br />
                 <p>{course.lessons && course.lessons.length} Lessons</p>
                 <Badge count={course.category}  style={{ backgroundColor: "#03a9f4" }} />
-                <h4 className='pt-2'>{course.paid?course.price:"Free"}</h4>
+                <h4 className='pt-2'>{course.paid?currencyFormatter({
+                  amount:course.price,
+                  currency:'usd'
+                }):"Free"}</h4>
               </Card>
             </a>
           </Link>
