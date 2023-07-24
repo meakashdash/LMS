@@ -5,9 +5,13 @@ import CourseCreateForm from '../../../../components/forms/CourseCreateForm'
 import Resizer from 'react-image-file-resizer'
 import {toast} from 'react-toastify'
 import {useRouter} from 'next/router'
-import {List,Avatar} from 'antd'
+import {List,Avatar,Tooltip,Button,Modal} from 'antd'
+import {DeleteOutlined} from '@ant-design/icons'
+import AddLessonForm from '../../../../components/forms/AddLessonForm'
 
 const {Item}=List
+
+
 
 
 
@@ -38,6 +42,9 @@ const CreateEdit=()=>{
 
     //get the slug from the params router
     const {slug}=router.query;
+
+    //for modal visibke
+    const [showModal,setShowModal]=useState(false);
 
     //useEffect to load the course
     useEffect(()=>{
@@ -135,6 +142,19 @@ const CreateEdit=()=>{
         toast.success("Lesson Rearrangement Successful");
     }
 
+    const handleDelete=async(lessonId)=>{
+        // console.log('handle delete',lessonId);
+        try {
+            const {data}=await axios.put(`/api/course/${slug}/${lessonId}`);
+            // console.log('LESSON DELETE',data);
+            setValues({...values,lessons:data.lessons});
+            toast.success('Lesson Deleted');
+        } catch (error) {
+            console.log(error);
+            toast.error('Lesson Delete Failed');
+        }
+    }
+
 
     return(
         <InstructorRoute>
@@ -158,13 +178,22 @@ const CreateEdit=()=>{
             <div>
                 <h4>{values && values.lessons && values.lessons.length} Lessons</h4>
                 <List onDragOver={(e)=>e.preventDefault()} itemLayout='horizontal' dataSource={values && values.lessons} renderItem={(item,index)=>(
-                    <Item draggable onDragStart={(e)=>handleDragStart(e,index)} onDrop={(e)=>handleDragStop(e,index)}>
-                        <Item.Meta
-                            avatar={<Avatar>{index+1}</Avatar>}
-                            title={item.title}
-                        >
-                        </Item.Meta>
-                    </Item>
+                        <Item onClick={()=>setShowModal(!showModal)} draggable onDragStart={(e)=>handleDragStart(e,index)} onDrop={(e)=>handleDragStop(e,index)}>
+                            <Item.Meta
+                                avatar={<Avatar>{index+1}</Avatar>}
+                                title={item.title}
+                            >
+                            </Item.Meta>
+                            <Tooltip title="Delete" placement="bottom">
+                                <Button
+                                    type="link"
+                                    onClick={() => handleDelete(item._id)} 
+                                    style={{ color: 'red' }}
+                                >
+                                    <DeleteOutlined />
+                                </Button>
+                            </Tooltip>
+                        </Item>     
                 )}>
                 </List>
             </div>

@@ -19,6 +19,7 @@ const CourseView=()=>{
         title:"",
         content:"",
         video:{},
+        free_preview:false,
     });
     //for loading value
     const[uploading,setUploading]=useState(false);
@@ -48,7 +49,7 @@ const CourseView=()=>{
         try {
             const {data}=await axios.post(`/api/course/lesson/${slug}/${course.instructor._id}`,values);
             console.log(data);
-            setValues({...values,title:"",content:"",video:{}});
+            setValues({...values,title:"",content:"",video:{},free_preview:false});
             setUploadButtonText('Upload Video');	
             setVisible(false);
             setCourse(data);
@@ -172,14 +173,14 @@ const CourseView=()=>{
                                     footer={null}
                                 >
                                     <AddLessonForm 
-                                    values={values} 
-                                    setValues={setValues} 
-                                    handleAddLesson={handleAddLesson} 
-                                    uploading={uploading}
-                                    uploadButtonText={uploadButtonText}
-                                    handleVideo={handleVideo}
-                                    progress={progress}
-                                    handleRemoveVideo={handleRemoveVideo}
+                                        values={values} 
+                                        setValues={setValues} 
+                                        handleAddLesson={handleAddLesson} 
+                                        uploading={uploading}
+                                        uploadButtonText={uploadButtonText}
+                                        handleVideo={handleVideo}
+                                        progress={progress}
+                                        handleRemoveVideo={handleRemoveVideo}
                                     />
                                 </Modal>
                             </Col>

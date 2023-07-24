@@ -191,7 +191,7 @@ export const removeVideo=async(req,res)=>{
 export const addLesson=async(req,res)=>{
     try {
         const {slug,instructorId}=req.params;
-        const {title,content,video}=req.body;
+        const {title,content,video,free_preview}=req.body;
 
         if(req.auth._id != instructorId){
             return res.status(400).send("Unauthorized");
@@ -199,7 +199,7 @@ export const addLesson=async(req,res)=>{
 
         //if we dont add the new:true theby default it will return the old data
         const updated=await Course.findOneAndUpdate({slug},{
-            $push:{lessons:{title,content,video}}
+            $push:{lessons:{title,content,video,free_preview}}
         },{new:true}).populate("instructor","_id name").exec();
 
         res.json(updated);
@@ -271,6 +271,52 @@ export const courses=async(req,res)=>{
     } catch (error) {
         console.log(error);
         return res.status(400).send("Course fetch failed");
+    }
+}
+
+
+export const removeLesson=async(req,res)=>{
+    try {
+        const {slug,lessonId}=req.params;
+        const course=await Course.findOne({slug}).exec();
+        
+        if (!course) {
+            return res.status(404).json({ error: 'Course not found' });
+        }
+
+        if (course.instructor != req.auth._id) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const lessonIndex = course.lessons.findIndex(lesson => lesson._id.toString() === lessonId);
+
+        if(lessonIndex === -1){
+            return res.status(404).json({ error: 'Lesson not found' });
+        }
+
+        const params={
+            Bucket:course.lessons[lessonIndex].video.Bucket,
+            Key:course.lessons[lessonIndex].video.Key,
+        }
+
+        S3.deleteObject(params,(error,data)=>{
+            if(error){
+                console.log(error);
+                res.sendStatus(400).json({error:"Delete Lesson from S3 Failed"});
+            }
+            course.lessons.splice(lessonIndex, 1);
+            course.save((err, updatedCourse) => {
+                if (err) {
+                  console.error('Error saving updated course:', err);
+                  return res.status(500).json({ error: 'Internal server error' });
+                }
+        
+                return res.json(updatedCourse);
+            });
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(400).send("Remove Lesson Failed");
     }
 }
 

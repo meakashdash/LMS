@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import axios from 'axios';
-import {Button,Progress, Tooltip} from 'antd';
+import {Button,Progress, Tooltip,Checkbox} from 'antd';
 import {CloseCircleFilled} from '@ant-design/icons';
 
 
@@ -42,6 +42,16 @@ const AddLessonForm=({values,setValues,handleAddLesson,uploading,uploadButtonTex
                             </span>
                         </Tooltip>
                     )}
+                </div>
+
+                <div className='form-check mt-3'>
+                    <Checkbox
+                        checked={values.free_preview}
+                        onChange={(e) => setValues({ ...values, free_preview: e.target.checked })}
+                        className='form-check-input'
+                    >
+                    Free Preview
+                    </Checkbox>
                 </div>
 
                 {progress>0 && (

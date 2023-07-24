@@ -1,5 +1,16 @@
 import express from 'express'
-import {uploadImage,removeImage,create,instructorCourses,read,uploadVideo,removeVideo,addLesson,update,publishCourse,unpublishCourse,courses} from '../controller/course'
+import {uploadImage,
+    removeImage,
+    create,
+    instructorCourses,
+    read,uploadVideo,
+    removeVideo,
+    addLesson,
+    update,
+    publishCourse,
+    unpublishCourse,
+    courses,
+    removeLesson} from '../controller/course'
 //middlewares
 
 import {requireSignin,isInstructor} from '../middlewares'
@@ -34,5 +45,8 @@ router.post('/course/lesson/:slug/:instructorId',requireSignin,addLesson);
 //for publish and unpublish the course
 router.put('/course/publish/:courseId',requireSignin,publishCourse);
 router.put('/course/unpublish/:courseId',requireSignin,unpublishCourse);
+
+//for deleting the lessons
+router.put('/course/:slug/:lessonId',requireSignin,removeLesson);
 
 module.exports = router
