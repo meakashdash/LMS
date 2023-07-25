@@ -10,7 +10,9 @@ import {uploadImage,
     publishCourse,
     unpublishCourse,
     courses,
-    removeLesson} from '../controller/course'
+    removeLesson,
+    checkEnrollent,
+    freeEnrollment} from '../controller/course'
 //middlewares
 
 import {requireSignin,isInstructor} from '../middlewares'
@@ -48,5 +50,11 @@ router.put('/course/unpublish/:courseId',requireSignin,unpublishCourse);
 
 //for deleting the lessons
 router.put('/course/:slug/:lessonId',requireSignin,removeLesson);
+
+//for checking the user is enrolled or not
+router.get('/check-enrollment/:courseId',requireSignin,checkEnrollent);
+
+//for doing the free-enrollment
+router.post('/free-enrollment/:courseId',requireSignin,freeEnrollment);
 
 module.exports = router

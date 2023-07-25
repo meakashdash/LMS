@@ -3,6 +3,7 @@ import {nanoid} from 'nanoid'
 import slugify from 'slugify'
 import Course from '../models/course.js'
 import {readFileSync} from 'fs'
+import User from '../models/user.js'
 
 const awsConfig={
     accessKeyId:process.env.AWS_ACCESS_KEY_ID,
@@ -319,4 +320,46 @@ export const removeLesson=async(req,res)=>{
         return res.status(400).send("Remove Lesson Failed");
     }
 }
+
+
+export const checkEnrollent=async(req,res)=>{
+    try {
+        const {courseId}=req.params;
+        const user=await User.findById(req.auth._id).exec();
+        
+        //check if the course is already enrolled or not
+        let ids=[]
+        for(let i=0; i < user.courses.length; i++){
+            ids.push(user.courses[i].toString());
+        }
+        res.json({
+            status:ids.includes(courseId),
+            course:await Course.findById(courseId).exec()
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(400).send("Check enrollment failed");
+    }
+}
+
+export const freeEnrollment=async(req,res)=>{
+    try {
+        const {courseId}=req.params;
+        const course=await Course.findById(courseId).exec();
+        if(course.paid) return;
+
+        const result=await User.findByIdAndUpdate(req.auth._id,{
+            $addToSet:{courses:course._id}
+        },{new:true}).exec();
+
+        res.json({
+            message:"Congratulations! You have successfully enrolled",
+            course,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(400).send("Free enrollment failed");
+    }
+}
+
 

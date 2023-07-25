@@ -5,11 +5,23 @@ import { Button, Card, Row, Col, Image, Typography, Space } from 'antd';
 import SingleCourseLessons from './SingleCourseLessons';
 import {currencyFormatter} from '../../utils/helpers'
 import ReactPlayer from 'react-player'
+import { LoadingOutlined, SafetyOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
 
-const SingleCourseView=({course,preview,visible,setPreview,setVisible})=>{
+const SingleCourseView=({
+  course,
+  preview,
+  visible,
+  setPreview,
+  setVisible,
+  user,
+  handlePaidEnrollment,
+  handleFreeEnrollment,
+  loading,
+  enrolled,
+  setEnrolled})=>{
     return(
         <div style={{ margin: '40px auto', maxWidth: '1200px' }}>
         <Row gutter={[16, 16]}>
@@ -34,9 +46,13 @@ const SingleCourseView=({course,preview,visible,setPreview,setVisible})=>{
             style={{ height: '200px', objectFit: 'cover', borderRadius: '4px' }}
           />}
             <div style={{ marginTop: '20px' }}>
-              <Button type="primary" onClick={() => router.push(`/courses/${course.slug}`)}>
-                Enroll Now
-              </Button>
+              {loading?(<div className='d-flex justify-content-center'>
+                  <LoadingOutlined />
+              </div>):(
+                <Button type="primary" icon={<SafetyOutlined />} disabled={loading} shape='round' block onClick={course.paid?handlePaidEnrollment:handleFreeEnrollment}>
+                  {user?enrolled.status?"Go to Course":"Enroll":"Log in to Enroll"}
+                </Button>
+              )}
             </div>
           </Col>
           <Col xs={24} sm={12}>

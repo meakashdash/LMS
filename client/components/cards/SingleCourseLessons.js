@@ -24,11 +24,7 @@ const SingleCourseLessons=({course,preview,setPreview,visible,setVisible})=>{
                 >
                   <Title level={4}>{lesson.title}</Title>
                   <Space>
-                    {lesson.free_preview && (
-                      <span onClick={()=>{setPreview(lesson.video.Location); setVisible(!visible);}} style={{ backgroundColor: '#52c41a', padding: '6px 12px', borderRadius: '4px' }}>
-                        Free Preview
-                      </span>
-                    )}
+                    
                     {lesson.content && (
                       <Button
                         type="primary"
@@ -38,7 +34,12 @@ const SingleCourseLessons=({course,preview,setPreview,visible,setVisible})=>{
                         Open Content
                       </Button>
                     )}
-                    {lesson.video && (
+                    {lesson.free_preview && (
+                      <Button icon={<PlayCircleOutlined />}  onClick={()=>{setPreview(lesson.video.Location); setVisible(!visible);}} style={{ backgroundColor: '#52c41a', padding: '6px 12px', borderRadius: '4px' }}>
+                        Free Preview
+                      </Button>
+                    )}
+                    {lesson.video && !lesson.free_preview && (
                       <Button
                         type="danger"
                         icon={<PlayCircleOutlined />}
