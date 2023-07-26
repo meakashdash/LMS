@@ -12,7 +12,9 @@ import {uploadImage,
     courses,
     removeLesson,
     checkEnrollent,
-    freeEnrollment} from '../controller/course'
+    freeEnrollment,
+    paidEnrollment,
+    stripeSuccess} from '../controller/course'
 //middlewares
 
 import {requireSignin,isInstructor} from '../middlewares'
@@ -56,5 +58,10 @@ router.get('/check-enrollment/:courseId',requireSignin,checkEnrollent);
 
 //for doing the free-enrollment
 router.post('/free-enrollment/:courseId',requireSignin,freeEnrollment);
+//for doing the paid-enrollment
+router.post('/paid-enrollment/:courseId',requireSignin,paidEnrollment);
+
+//for the stripe success
+router.get('/stripe-success/:courseId',requireSignin,stripeSuccess);
 
 module.exports = router

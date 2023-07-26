@@ -34,9 +34,11 @@ const Index = ({courses}) => {
 
 export const getServerSideProps=async()=>{
   const {data}=await axios.get(`${process.env.API}/courses`);
-  return{
-    props:{
-      courses:data,
+  if(data){
+    return{
+      props:{
+        courses:data,
+      }
     }
   }
 }

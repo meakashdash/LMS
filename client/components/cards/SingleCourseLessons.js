@@ -35,7 +35,7 @@ const SingleCourseLessons=({course,preview,setPreview,visible,setVisible})=>{
                       </Button>
                     )}
                     {lesson.free_preview && (
-                      <Button icon={<PlayCircleOutlined />}  onClick={()=>{setPreview(lesson.video.Location); setVisible(!visible);}} style={{ backgroundColor: '#52c41a', padding: '6px 12px', borderRadius: '4px' }}>
+                      <Button icon={<PlayCircleOutlined />}  onClick={()=>{setPreview(lesson.video && lesson.video.Location); setVisible(!visible);}} style={{ backgroundColor: '#52c41a', padding: '6px 12px', borderRadius: '4px' }}>
                         Free Preview
                       </Button>
                     )}

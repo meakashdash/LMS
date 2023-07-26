@@ -4,6 +4,8 @@ import slugify from 'slugify'
 import Course from '../models/course.js'
 import {readFileSync} from 'fs'
 import User from '../models/user.js'
+const Stripe = require('stripe');
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 const awsConfig={
     accessKeyId:process.env.AWS_ACCESS_KEY_ID,
@@ -359,6 +361,83 @@ export const freeEnrollment=async(req,res)=>{
     } catch (error) {
         console.log(error);
         res.status(400).send("Free enrollment failed");
+    }
+}
+
+export const paidEnrollment=async(req,res)=>{
+    try {
+        //get the course id
+        const {courseId}=req.params;
+        //get the course
+        const course=await Course.findById(courseId).populate("instructor").exec();
+        //check if paid or not
+        if(!course.paid) return;
+        //platform fee 30%
+        const fee=(course.price*30)/100;
+        //create a stripe session
+        const session=await stripe.checkout.sessions.create({
+            payment_method_types:['card'],
+            //purchase details
+            line_items:[
+                {
+                    price_data: {
+                        currency: 'inr',
+                        product_data: {
+                          name: course.name, // Replace with the actual course name
+                        },
+                        unit_amount: Math.round(course.price.toFixed(2) * 100),
+                      },
+                    quantity: 1,
+                },
+            ],
+            //specifying the mode
+            mode: 'payment',
+            //charge the buyer and transfer the remaining fee to the instructor
+            payment_intent_data:{
+                application_fee_amount:Math.round(fee.toFixed(2)*100),
+                transfer_data:{
+                    destination:course.instructor.stripe_account_id
+                },
+            },
+            //success and cancel url
+            success_url:`${process.env.STRIPE_SUCCESS_URL}/${course._id}`,
+            cancel_url:process.env.STRIPE_CANCEL_URL,
+        })
+        console.log("SESSION",session);
+        //save in the user database
+        await User.findByIdAndUpdate(req.auth._id,{stripeSession:session}).exec();
+        res.send(session.id);
+    } catch (error) {
+        console.log(error);
+        res.status(400).send("Paid enrollment failed");
+    }
+}
+
+export const stripeSuccess=async(req,res)=>{
+    try {
+        //get the course
+        const {courseId}=req.params;
+        //find the user
+        const user=await User.findById(req.auth._id).exec();
+        //get the course
+        const course=await Course.findById(courseId).exec();
+        //If no stripe session return
+        if(!user.stripeSession.id) return res.sendStatus(400);
+        //retrieve the stripe session
+        const session=await stripe.checkout.sessions.retrieve(user.stripeSession.id); 
+        // {CHECK THIS LINE LATER}
+
+        //if the paymentStatus is paid then push the course into the users course array
+        if(session.payment_status === 'paid'){  //{CHECK THIS LINE LATER "true" is replaced by session.payment_status === 'paid'}
+            await User.findByIdAndUpdate(req.auth._id,{
+                $addToSet:{courses:course._id},
+                $set:{stripeSession:{}},
+            },{new:true}).exec();
+        }
+        res.json({success:true,course});
+    } catch (error) {
+        console.log(error);
+        res.json({success:false});
     }
 }
 

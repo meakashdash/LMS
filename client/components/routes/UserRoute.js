@@ -5,7 +5,7 @@ import {useRouter} from 'next/router'
 import {SyncOutlined} from '@ant-design/icons'
 import UserNav from '../nav/UserNav'
 
-const UserRoute=({children})=>{
+const UserRoute=({children,showNav=true})=>{
     //written for checking the user is present or not and that way to give output
     const [ok,setOk]=useState(false)
 
@@ -35,7 +35,7 @@ const UserRoute=({children})=>{
         (<div className='container-fluid'>
             <div className='row'>
                 <div className='col-md-2'>
-                    <UserNav />
+                    {showNav && <UserNav />}
                 </div>
                 <div className='col-md-10'>
                     {children}
