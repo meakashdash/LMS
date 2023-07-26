@@ -441,4 +441,17 @@ export const stripeSuccess=async(req,res)=>{
     }
 }
 
+export const userCourses=async(req,res)=>{
+    try {
+        const user=await User.findById(req.auth._id).exec();
+        console.log(user.courses);
+        const courses=await Course.find({_id:{$in:user.courses}}).populate("instructor","_id name").exec();
+        // console.log(courses)
+        res.json(courses);
+    } catch (error) {
+        console.log(error);
+        res.status(400).send("User courses fetch failed");
+    }
+}
+
 

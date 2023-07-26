@@ -14,10 +14,11 @@ import {uploadImage,
     checkEnrollent,
     freeEnrollment,
     paidEnrollment,
-    stripeSuccess} from '../controller/course'
+    stripeSuccess,
+    userCourses} from '../controller/course'
 //middlewares
 
-import {requireSignin,isInstructor} from '../middlewares'
+import {requireSignin,isInstructor,isEnrolled} from '../middlewares'
 import formidable from 'express-formidable'
 
 
@@ -63,5 +64,10 @@ router.post('/paid-enrollment/:courseId',requireSignin,paidEnrollment);
 
 //for the stripe success
 router.get('/stripe-success/:courseId',requireSignin,stripeSuccess);
+
+//for getting the user courses
+router.get('/user-courses',requireSignin,userCourses);
+//for the enrolled users learning page
+router.get('/user/course/:slug',requireSignin,isEnrolled,read);
 
 module.exports = router
