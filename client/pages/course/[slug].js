@@ -34,7 +34,6 @@ const SingleCourse = ({ course }) => {
 
   const checkEnrollent=async()=>{
     const {data}=await axios.get(`/api/check-enrollment/${course._id}`);
-    console.log(data);
     setEnrolled(data);
   }
 

@@ -12,7 +12,6 @@ export const makeInstructor=async(req,res)=>{
     //2. if the user dont have stripe_account_id then create a new one
     if(!user.stripe_account_id){
         const account=await stripe.accounts.create({type:'standard'})
-        console.log("ACCOUNT=>",account)
         user.stripe_account_id=account.id
         user.save()
     }
@@ -74,3 +73,39 @@ export const currentInstructor=async(req,res)=>{
         console.log(error)
     }
 }
+
+
+export const instructorStudentCount=async(req,res)=>{
+    try {
+        const user=await User.find({courses:req.body.courseId}).select("_id").exec()
+        res.json(user);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Instructor student count error');
+    }
+}
+
+export const instructorBalance = async (req, res) => {
+    try {
+      let user = await User.findById(req.user._id).exec();
+      const balance = await stripe.balance.retrieve({
+        stripeAccount: user.stripe_account_id,
+      });
+      res.json(balance);
+    } catch (err) {
+      console.log(err);
+    }
+};
+
+export const instructorPayoutSettings = async (req, res) => {
+    try {
+      const user = await User.findById(req.user._id).exec();
+      const loginLink = await stripe.accounts.createLoginLink(
+        user.stripe_seller.id,
+        { redirect_url: process.env.STRIPE_SETTINGS_REDIRECT }
+      );
+      res.json(loginLink.url);
+    } catch (err) {
+      console.log("stripe payout settings login link err => , err");
+    }
+  };

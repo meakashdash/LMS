@@ -3,7 +3,7 @@ import {useRouter} from 'next/router';
 import axios from 'axios';
 import InstructorRoute from '../../../../components/routes/InstructorRoute';
 import {Avatar,Tooltip,Row, Col, Card,Button,Modal,List} from 'antd'
-import { CheckOutlined,CloseOutlined,EditOutlined,PlusOutlined, QuestionOutlined } from '@ant-design/icons';
+import { CheckOutlined,CloseOutlined,EditOutlined,PlusOutlined, QuestionOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import ReactMarkdown from 'react-markdown';
 import AddLessonForm from '../../../../components/forms/AddLessonForm';
 import {toast} from 'react-toastify';
@@ -27,6 +27,8 @@ const CourseView=()=>{
     const [uploadButtonText,setUploadButtonText]=useState('Upload Video');
     //to track the progress of uploading the video
     const [progress,setProgress]=useState(0);
+    //for making the student count
+    const [studentCount,setStudentCount]=useState(0);
 
     const router=useRouter();
     const {slug}=router.query;
@@ -36,11 +38,14 @@ const CourseView=()=>{
         loadCourse();
     },[slug])
 
+    useEffect(()=>{
+        if(course) studentCountf();
+    },[course])
+
     const loadCourse=async()=>{
         //we have to destruct the data from the response
         const {data}=await axios.get(`/api/course/${slug}`);
         setCourse(data);
-        // console.log(data);
     }
 
     //function to add lesson
@@ -77,7 +82,6 @@ const CourseView=()=>{
                     setProgress(Math.round((100*e.loaded)/e.total));
                 }
             })
-            console.log(data);
             setValues({...values,video:data});
             setUploading(false);
         } catch (error) {
@@ -93,7 +97,6 @@ const CourseView=()=>{
     //for video removal
     const handleRemoveVideo=async()=>{
         try {
-            // console.log(values);
             setUploading(true);
             const {data}=axios.post(`/api/course/remove-video/${course.instructor._id}`,values.video);
             setValues({...values,video:{}});
@@ -130,6 +133,11 @@ const CourseView=()=>{
         }
     }
 
+    const studentCountf=async()=>{
+        const {data}=await axios.post('/api/instructor/student-count',{courseId:course._id});
+        setStudentCount(data.length);
+    }
+
     return(
         <InstructorRoute>
             <div className='container-fluid pt-3'>
@@ -142,6 +150,9 @@ const CourseView=()=>{
                                     <Card.Meta title={course.name} description={course.category} />
                                     <p className='mt-2'>{course.lessons && course.lessons.length} Lessons</p>
                                     <div className='d-flex justify-content-between'>
+                                        <Tooltip title={"Total "+studentCount+" Students Enrolled"}>
+                                            <UserSwitchOutlined className='h5 text-info' />
+                                        </Tooltip>
                                         <Tooltip title='Edit'>
                                             <EditOutlined onClick={()=>router.push(`/instructor/course/edit/${slug}`)} className='h5 text-warning' />
                                         </Tooltip>

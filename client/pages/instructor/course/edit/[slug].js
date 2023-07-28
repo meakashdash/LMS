@@ -93,7 +93,6 @@ const CreateEdit=()=>{
                     image:uri,
                 })
                 //lets  see the data
-                console.log("IMAGE UPLOADED",data)
                 setImage(data.data)
                 //set loading to false
                 setValues({...values,loading:false})
@@ -110,7 +109,6 @@ const CreateEdit=()=>{
     const handleSubmit=async(e)=>{
         e.preventDefault()
         try {
-            // console.log(values)
             const {data}=await axios.put(`/api/course/${slug}`,{...values,image});
             toast.success("Congratulation. Your course is now Updated");
             // router.push('/instructor')
@@ -120,12 +118,10 @@ const CreateEdit=()=>{
     }
 
     const handleDragStart=(e,index)=>{
-        // console.log('ON DRAG START',index);
         e.dataTransfer.setData('itemIndex',index);
     }
 
     const handleDragStop=async (e,index)=>{
-        // console.log('ON DRAG STOP',index);
         const movingItemIndex=e.dataTransfer.getData('itemIndex');
         const targetItemIndex=index;
 
@@ -143,10 +139,8 @@ const CreateEdit=()=>{
     }
 
     const handleDelete=async(lessonId)=>{
-        // console.log('handle delete',lessonId);
         try {
             const {data}=await axios.put(`/api/course/${slug}/${lessonId}`);
-            // console.log('LESSON DELETE',data);
             setValues({...values,lessons:data.lessons});
             toast.success('Lesson Deleted');
         } catch (error) {

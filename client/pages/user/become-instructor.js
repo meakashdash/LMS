@@ -12,7 +12,6 @@ const BecomeInstructor=()=>{
 
 
     const becomeInstructor=()=>{
-        // console.log("Instructor incoming")
         setLoading(true)
         axios
         .post('/api/make-instructor')

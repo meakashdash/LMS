@@ -24,7 +24,6 @@ const SingleCourse = () => {
     try {
         setLoading(true);
         const {data}=await axios.get(`/api/user/course/${slug}`);
-        console.log(data);
         setCourses(data);
         setLoading(false);
     } catch (error) {
@@ -51,7 +50,6 @@ const SingleCourse = () => {
       courseId:courses?._id,
       lessonId:selectedLesson?._id,
     })
-    console.log(data);
     setCompletedLessons([...completedLessons,selectedLesson?._id]);
   }
 
@@ -61,7 +59,6 @@ const SingleCourse = () => {
         courseId:courses?._id,
         lessonId:selectedLesson?._id,
       })
-      console.log(data);
       const all=completedLessons;
       const index=all.indexOf(selectedLesson?._id);
       if(index>-1){

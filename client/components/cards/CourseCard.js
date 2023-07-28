@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { currencyFormatter } from '../../utils/helpers';
 
 const CourseCard = ({ courses }) => {
-  console.log(courses);
   return (
     <>
       {courses && courses.map((course) => (

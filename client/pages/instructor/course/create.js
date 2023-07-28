@@ -66,7 +66,6 @@ const CreateCourse=()=>{
                     image:uri,
                 })
                 //lets  see the data
-                console.log("IMAGE UPLOADED",data)
                 setImage(data.data)
                 //set loading to false
                 setValues({...values,loading:false})
@@ -83,7 +82,6 @@ const CreateCourse=()=>{
     const handleSubmit=async(e)=>{
         e.preventDefault()
         try {
-            // console.log(values)
             const data=await axios.post('/api/course',{...values,image})
             toast.success("Congratulation. Your course is now live")
             router.push('/instructor')
@@ -108,7 +106,6 @@ const CreateCourse=()=>{
                     handleImageRemove={handleImageRemove}
                 />
             </div>
-            <pre>{JSON.stringify(image,null,4)}</pre>
         </InstructorRoute>
     )
 }

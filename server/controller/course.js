@@ -47,7 +47,6 @@ export const uploadImage=async(req,res)=>{
                 console.log(err)
                 return res.sendStatus(400).json({error:"Upload to s3 failed"})
             }
-            console.log(data)
             return res.send(data)
         })
 
@@ -404,7 +403,7 @@ export const paidEnrollment=async(req,res)=>{
             success_url:`${process.env.STRIPE_SUCCESS_URL}/${course._id}`,
             cancel_url:process.env.STRIPE_CANCEL_URL,
         })
-        console.log("SESSION",session);
+
         //save in the user database
         await User.findByIdAndUpdate(req.auth._id,{stripeSession:session}).exec();
         res.send(session.id);
@@ -445,7 +444,6 @@ export const stripeSuccess=async(req,res)=>{
 export const userCourses=async(req,res)=>{
     try {
         const user=await User.findById(req.auth._id).exec();
-        console.log(user.courses);
         const courses=await Course.find({_id:{$in:user.courses}}).populate("instructor","_id name").exec();
         // console.log(courses)
         res.json(courses);
@@ -458,7 +456,6 @@ export const userCourses=async(req,res)=>{
 export const markCompleted=async(req,res)=>{
     try {
         const{courseId,lessonId}=req.body;
-        console.log(courseId,lessonId)
         const existing=await Completed.findOne({user:req.auth._id,course:courseId}).exec();
         if(existing){
             //update

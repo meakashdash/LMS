@@ -16,6 +16,9 @@ const InstructorNav=()=>{
             <Link legacyBehavior href='/instructor/course/create'>
                 <a style={{textDecoration: 'none'}} className={`nav-link ${current === '/instructor/course/create' && 'active'} `}>Course Create</a>
             </Link>
+            <Link legacyBehavior href='/instructor/revenue'>
+                <a style={{textDecoration: 'none'}} className={`nav-link ${current === '/instructor/revenue' && 'active'} `}>Revenue</a>
+            </Link>
         </div>
     )
 }
