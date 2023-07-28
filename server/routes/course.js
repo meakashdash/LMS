@@ -15,7 +15,10 @@ import {uploadImage,
     freeEnrollment,
     paidEnrollment,
     stripeSuccess,
-    userCourses} from '../controller/course'
+    userCourses,
+    markCompleted,
+    listCompleted,
+    markIncompleted} from '../controller/course'
 //middlewares
 
 import {requireSignin,isInstructor,isEnrolled} from '../middlewares'
@@ -69,5 +72,14 @@ router.get('/stripe-success/:courseId',requireSignin,stripeSuccess);
 router.get('/user-courses',requireSignin,userCourses);
 //for the enrolled users learning page
 router.get('/user/course/:slug',requireSignin,isEnrolled,read);
+
+//mark completed/incompleted
+router.post('/mark-completed',requireSignin,markCompleted);
+
+
+//list completed
+router.post('/list-completed',requireSignin,listCompleted);
+
+router.post('/mark-incompleted',requireSignin,markIncompleted);
 
 module.exports = router

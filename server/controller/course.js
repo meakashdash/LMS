@@ -4,6 +4,7 @@ import slugify from 'slugify'
 import Course from '../models/course.js'
 import {readFileSync} from 'fs'
 import User from '../models/user.js'
+import Completed from '../models/completed.js'
 const Stripe = require('stripe');
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -451,6 +452,56 @@ export const userCourses=async(req,res)=>{
     } catch (error) {
         console.log(error);
         res.status(400).send("User courses fetch failed");
+    }
+}
+
+export const markCompleted=async(req,res)=>{
+    try {
+        const{courseId,lessonId}=req.body;
+        console.log(courseId,lessonId)
+        const existing=await Completed.findOne({user:req.auth._id,course:courseId}).exec();
+        if(existing){
+            //update
+            const updated=await Completed.findOneAndUpdate({user:req.auth._id,course:courseId},{$addToSet:{lessons:lessonId}}).exec();
+            res.json({ok:true});
+        }else{
+            //create a new
+            const created = await new Completed({
+                user: req.auth._id,
+                course: courseId,
+                lessons: [lessonId],
+              }).save();
+            res.json({ok:true});
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(400).send("Mark completed failed");
+    }
+}
+
+export const listCompleted=async(req,res)=>{
+    try {
+        const {courseId}=req.body;
+        const list=await Completed.findOne({user:req.auth._id,course:courseId}).exec();
+        list && res.json(list.lessons);
+    } catch (error) {
+        console.log(error);
+        res.status(400).send("List completed failed");
+    }
+}
+
+export const markIncompleted=async(req,res)=>{
+    try {
+        const updated=await Completed.findOneAndUpdate({
+            user:req.auth._id,
+            course:req.body.courseId,
+        },{
+            $pull:{lessons:req.body.lessonId},
+        }).exec();
+        res.json({ok:true});
+    } catch (error) {
+        console.log(error)
+        res.status(400).send("Mark incompleted failed");
     }
 }
 
