@@ -7,7 +7,6 @@ import {toast} from 'react-toastify'
 import {useRouter} from 'next/router'
 import {List,Avatar,Tooltip,Button,Modal} from 'antd'
 import {DeleteOutlined} from '@ant-design/icons'
-import AddLessonForm from '../../../../components/forms/AddLessonForm'
 
 const {Item}=List
 

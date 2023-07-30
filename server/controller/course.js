@@ -383,7 +383,7 @@ export const paidEnrollment=async(req,res)=>{
                     price_data: {
                         currency: 'inr',
                         product_data: {
-                          name: course.name, // Replace with the actual course name
+                          name: course.name, 
                         },
                         unit_amount: Math.round(course.price.toFixed(2) * 100),
                       },
